@@ -1,30 +1,38 @@
 from django.contrib import admin
-# <HINT> Import any new Models here
-from .models import Course, Lesson, Instructor, Learner
+from .models import Course, Lesson, Instructor, Learner, Question, Choice
 
-# <HINT> Register QuestionInline and ChoiceInline classes here
+# Inline class for Choice model. This allows editing choices directly within the Question form.
+class ChoiceInline(admin.TabularInline):  # Using TabularInline to display choices as a table format
+    model = Choice
+    extra = 3
 
+# Inline class for Question model. This allows editing questions directly within the Course form.
+class QuestionInline(admin.TabularInline):  
+    model = Question
+    extra = 1  # Just add 1 extra blank form for adding new questions
 
 class LessonInline(admin.StackedInline):
     model = Lesson
     extra = 5
 
-
-# Register your models here.
+# Modify CourseAdmin to include QuestionInline
 class CourseAdmin(admin.ModelAdmin):
-    inlines = [LessonInline]
+    inlines = [LessonInline, QuestionInline]
     list_display = ('name', 'pub_date')
     list_filter = ['pub_date']
     search_fields = ['name', 'description']
 
-
 class LessonAdmin(admin.ModelAdmin):
     list_display = ['title']
 
+# Modify QuestionAdmin to include ChoiceInline
+class QuestionAdmin(admin.ModelAdmin):
+    inlines = [ChoiceInline]
 
-# <HINT> Register Question and Choice models here
-
+# Now register models with their respective Admin classes.
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Lesson, LessonAdmin)
 admin.site.register(Instructor)
 admin.site.register(Learner)
+admin.site.register(Question, QuestionAdmin)
+admin.site.register(Choice)
